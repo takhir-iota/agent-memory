@@ -12,10 +12,11 @@ const command = args[0];
 
 function usage() {
   console.log(`
-agent-memory — local cross-session memory for Claude Code
+agent-memory — local cross-session memory for Claude Code & OpenCode
 
 Commands:
   index                 Index all existing sessions into SQLite
+  summarize [hours]     Summarize recent sessions into memory files (default: 24h)
   search <pattern>      Regex search across all sessions
   sessions              List all indexed sessions
   stats                 Show index statistics
@@ -141,6 +142,21 @@ async function main() {
             `${s.sessionId.padEnd(10)} ${(s.project || "").padEnd(25)} ${String(s.turns).padEnd(7)} ${(s.updated || "").padEnd(12)} ${s.firstMessage || ""}`
           );
         }
+        break;
+      }
+
+      case "summarize": {
+        // First re-index to catch anything new
+        const { readdirSync: rds } = await import("fs");
+        const projectsDir = join(homedir(), ".claude", "projects");
+        const files = findSessionFiles(projectsDir);
+        for (const f of files) {
+          try { await indexSession(f); } catch {}
+        }
+
+        const { runSummarizer } = await import("../src/summarizer.js");
+        const hours = parseInt(args[1]) || 24;
+        await runSummarizer(hours);
         break;
       }
 
