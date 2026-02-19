@@ -1,0 +1,19 @@
+{
+  "name": "agent-memory",
+  "version": "1.0.0",
+  "description": "Local cross-session memory for Claude Code & OpenCode",
+  "type": "module",
+  "bin": {
+    "agent-memory": "./bin/cli.js"
+  },
+  "scripts": {
+    "watch": "node src/watcher.js",
+    "search": "node bin/cli.js search",
+    "index": "node bin/cli.js index",
+    "link": "npm link"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "chokidar": "^4.0.0"
+  }
+}
